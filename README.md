@@ -6,7 +6,7 @@ Each folder holds the code of the version on the mod page.
 
 ## Building the Skyrim plugins
 
-The plugins are built on [CommonLibSSE NG](https://github.com/alandtse/CommonLibVR) by Ryan McKenzie, CharmedBaryon and alandtse, which is under the MIT license. CMake fetches the version named in `skyrim-se/CMakeLists.txt`.
+The plugins are built on [CommonLibSSE NG](https://github.com/alandtse/CommonLibVR) by Ryan McKenzie, CharmedBaryon and alandtse. CMake fetches the version named in `skyrim-se/CMakeLists.txt`, 4.39.3, the last one under the MIT license.
 
 You need Visual Studio 2022 Build Tools with the C++ workload, which brings CMake and Ninja, and [vcpkg](https://github.com/microsoft/vcpkg) for the libraries in `vcpkg.json`. From a Visual Studio x64 prompt in `skyrim-se`:
 
@@ -19,4 +19,4 @@ The DLLs land in `build\bin`.
 
 ## License
 
-MIT, in the `LICENSE` file.
+A mod folder with its own `LICENSE.txt` is under that license. Everything else is MIT, in the `LICENSE` file.

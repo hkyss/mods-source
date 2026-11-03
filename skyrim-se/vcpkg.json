@@ -1,0 +1,10 @@
+{
+  "name": "hkyss-skyrim",
+  "version-string": "1",
+  "dependencies": [
+    "directxtk",
+    "rapidcsv",
+    "spdlog",
+    "zlib"
+  ]
+}

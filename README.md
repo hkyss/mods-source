@@ -2,6 +2,9 @@
 
 Each folder holds the code of the version on the mod page.
 
+- [hkyss - ENB INI Cache](skyrim-se/hkyss%20-%20ENB%20INI%20Cache/src), on [Nexus Mods](https://www.nexusmods.com/skyrimspecialedition/mods/197597)
+- [hkyss - Head Sway](skyrim-se/hkyss%20-%20Head%20Sway/src), on [Nexus Mods](https://www.nexusmods.com/skyrimspecialedition/mods/195339)
+- [hkyss - Nolvus Gamepad Controls](skyrim-se/hkyss%20-%20Nolvus%20Gamepad%20Controls/src), on [Nexus Mods](https://www.nexusmods.com/skyrimspecialedition/mods/196000)
 - [hkyss - OAR Scan Cache](skyrim-se/hkyss%20-%20OAR%20Scan%20Cache/src), on [Nexus Mods](https://www.nexusmods.com/skyrimspecialedition/mods/197595)
 
 ## Building the Skyrim plugins

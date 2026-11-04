@@ -1,4 +1,4 @@
-set(version "1.0.2")
+set(version "1.0.3")
 
 add_commonlibsse_plugin(hkyssOarCache
 	AUTHOR hkyss

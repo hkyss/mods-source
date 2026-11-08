@@ -22,4 +22,6 @@ The DLLs land in `build\bin`.
 
 ## License
 
-A mod folder with its own `LICENSE.txt` is under that license. Everything else is MIT, in the `LICENSE` file.
+Copyright (C) 2026 hkyss
+
+Everything here is free software under the GNU General Public License, version 3 or any later version, in the `LICENSE` file. The libraries the plugins are built on keep their own licenses, which sit beside each mod that ships them.

@@ -10,6 +10,7 @@
 #include <format>
 #include <fstream>
 #include <mutex>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <thread>
@@ -18,6 +19,8 @@
 #include <vector>
 
 #include "../../imports.h"
+
+#pragma comment(lib, "version.lib")
 
 using namespace std::literals;
 
@@ -421,6 +424,24 @@ namespace
 		return Attributes(path, a_data, [&] { return originalAttributesA(a_path, a_level, a_data); });
 	}
 
+	std::optional<VS_FIXEDFILEINFO> FileVersion(HMODULE a_module)
+	{
+		std::wstring path(MAX_PATH * 4, L'\0');
+		path.resize(GetModuleFileNameW(a_module, path.data(), static_cast<DWORD>(path.size())));
+		DWORD      handle = 0;
+		const auto size = GetFileVersionInfoSizeW(path.c_str(), &handle);
+		if (!size) {
+			return std::nullopt;
+		}
+		std::vector<std::byte> data(size);
+		VS_FIXEDFILEINFO*      info = nullptr;
+		UINT                   length = 0;
+		if (!GetFileVersionInfoW(path.c_str(), 0, size, data.data()) || !VerQueryValueW(data.data(), L"\\", reinterpret_cast<void**>(&info), &length) || length < sizeof(VS_FIXEDFILEINFO)) {
+			return std::nullopt;
+		}
+		return *info;
+	}
+
 	void Install()
 	{
 		const HMODULE oar = GetModuleHandleW(L"OpenAnimationReplacer.dll");
@@ -428,6 +449,17 @@ namespace
 			Log("OpenAnimationReplacer.dll is not loaded, nothing to do");
 			serving = false;
 			return;
+		}
+		if (const auto version = FileVersion(oar)) {
+			const auto major = HIWORD(version->dwFileVersionMS);
+			Log("OpenAnimationReplacer {}.{}.{}", major, LOWORD(version->dwFileVersionMS), HIWORD(version->dwFileVersionLS));
+			if (major >= 3) {
+				Log("OAR 3 and later cache their own scan at kInputLoaded, nothing to do");
+				serving = false;
+				return;
+			}
+		} else {
+			Log("OpenAnimationReplacer.dll has no version, assuming 2.x");
 		}
 		std::string missing;
 		if (!RedirectImport(oar, "FindFirstFileExW", &CachedFindFirst, originalFindFirst)) {

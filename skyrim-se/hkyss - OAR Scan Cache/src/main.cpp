@@ -459,19 +459,21 @@ namespace
 			a_when, served.load(), compared.load(), passed.load(), early.load(), differences.load());
 	}
 
-	class MenuWatch : public RE::BSTEventSink<RE::MenuOpenCloseEvent>
+	const SKSE::detail::SKSETaskInterface* tasks = nullptr;
+
+	class StopServing : public SKSE::detail::TaskDelegate
 	{
 	public:
-		RE::BSEventNotifyControl ProcessEvent(const RE::MenuOpenCloseEvent* a_event, RE::BSTEventSource<RE::MenuOpenCloseEvent>*) override
+		void Run() override
 		{
-			if (a_event && a_event->opening && a_event->menuName == RE::MainMenu::MENU_NAME && serving.exchange(false)) {
-				Report("main menu, every call goes to Windows from now on");
+			if (serving.exchange(false)) {
+				Report("first frame after the data loaded, every call goes to Windows from now on");
 			}
-			return RE::BSEventNotifyControl::kContinue;
 		}
+		void Dispose() override {}
 	};
 
-	MenuWatch menuWatch;
+	StopServing stopServing;
 
 	void OnMessage(SKSE::MessagingInterface::Message* a_message)
 	{
@@ -485,9 +487,13 @@ namespace
 			}
 			break;
 		case SKSE::MessagingInterface::kDataLoaded:
-			if (const auto ui = RE::UI::GetSingleton()) {
-				ui->AddEventSink<RE::MenuOpenCloseEvent>(&menuWatch);
+			if (tasks) {
+				tasks->AddTask(&stopServing);
 			}
+			break;
+		case SKSE::MessagingInterface::kPreLoadGame:
+		case SKSE::MessagingInterface::kNewGame:
+			stopServing.Run();
 			break;
 		default:
 			break;
@@ -497,7 +503,6 @@ namespace
 
 SKSEPluginLoad(const SKSE::LoadInterface* a_skse)
 {
-	SKSE::Init(a_skse, false);
 	if (const auto directory = SKSE::log::log_directory()) {
 		logFile.open(*directory / "hkyssOarCache.log", std::ios::trunc);
 	}
@@ -511,6 +516,10 @@ SKSEPluginLoad(const SKSE::LoadInterface* a_skse)
 	workingDirectory = current;
 	root = Key(L"data\\meshes");
 	Log("mode {}, from {}", use ? "use" : "check", word.empty() ? "the default"s : kModeFile);
-	SKSE::GetMessagingInterface()->RegisterListener(OnMessage);
+	tasks = static_cast<const SKSE::detail::SKSETaskInterface*>(a_skse->QueryInterface(SKSE::LoadInterface::kTask));
+	const auto messaging =static_cast<const SKSE::detail::SKSEMessagingInterface*>(a_skse->QueryInterface(SKSE::LoadInterface::kMessaging));
+	if (!messaging || !messaging->RegisterListener(a_skse->GetPluginHandle(), "SKSE", reinterpret_cast<void*>(&OnMessage))) {
+		Log("SKSE gave no messaging interface, nothing to do");
+	}
 	return true;
 }
